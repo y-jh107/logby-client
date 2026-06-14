@@ -20,6 +20,7 @@ export default function SignupScreen() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const setToken = useAuthStore((s) => s.setToken);
+  const setUserId = useAuthStore((s) => s.setUserId);
 
   const handleSignup = async () => {
     if (!nickname.trim() || !email.trim() || !password.trim()) {
@@ -31,9 +32,12 @@ export default function SignupScreen() {
     try {
       await api.post('/api/auth/signup', { email, password, nickname });
 
-      // 회원가입 성공 후 자동 로그인
       const { data: loginRes } = await api.post('/api/auth/login', { email, password });
       await setToken(loginRes.data.accessToken);
+
+      const { data: meRes } = await api.get('/api/users/me');
+      setUserId(meRes.data.id);
+
       router.replace('/(tabs)/feed');
     } catch (err: any) {
       const message = err.response?.data?.message ?? '회원가입 중 오류가 발생했습니다.';
@@ -48,22 +52,13 @@ export default function SignupScreen() {
       className="flex-1 bg-white"
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
-        keyboardShouldPersistTaps="handled"
-      >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
         <View className="flex-1 px-8 pt-24 pb-12">
-          {/* 헤더 */}
           <View className="mb-12">
-            <Text className="text-3xl font-bold text-primary tracking-tight">
-              시작하기
-            </Text>
-            <Text className="text-sm text-secondary mt-1">
-              무료로 계정을 만들어보세요
-            </Text>
+            <Text className="text-3xl font-bold text-primary tracking-tight">시작하기</Text>
+            <Text className="text-sm text-secondary mt-1">무료로 계정을 만들어보세요</Text>
           </View>
 
-          {/* 입력 폼 */}
           <View className="gap-y-4">
             <View>
               <Text className="text-xs font-medium text-secondary mb-2 uppercase tracking-widest">
@@ -114,7 +109,6 @@ export default function SignupScreen() {
             </View>
           </View>
 
-          {/* 회원가입 버튼 */}
           <TouchableOpacity
             className="bg-primary rounded-xl py-4 mt-8 items-center"
             onPress={handleSignup}
@@ -124,20 +118,15 @@ export default function SignupScreen() {
             {loading ? (
               <ActivityIndicator color="#ffffff" size="small" />
             ) : (
-              <Text className="text-white text-sm font-semibold tracking-wide">
-                계정 만들기
-              </Text>
+              <Text className="text-white text-sm font-semibold tracking-wide">계정 만들기</Text>
             )}
           </TouchableOpacity>
 
-          {/* 로그인 링크 */}
           <View className="flex-row justify-center mt-6">
             <Text className="text-sm text-secondary">이미 계정이 있으신가요? </Text>
             <Link href="/(auth)/login" asChild>
               <TouchableOpacity disabled={loading}>
-                <Text className="text-sm font-semibold text-primary">
-                  로그인
-                </Text>
+                <Text className="text-sm font-semibold text-primary">로그인</Text>
               </TouchableOpacity>
             </Link>
           </View>
