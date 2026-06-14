@@ -7,16 +7,36 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { Link, router } from 'expo-router';
+import { api } from '../../lib/api';
+import { useAuthStore } from '../../store/authStore';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const setToken = useAuthStore((s) => s.setToken);
 
-  const handleLogin = () => {
-    // TODO: 인증 로직 연결
-    router.replace('/(tabs)/feed');
+  const handleLogin = async () => {
+    if (!email.trim() || !password.trim()) {
+      Alert.alert('입력 오류', '이메일과 비밀번호를 모두 입력해주세요.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data: res } = await api.post('/api/auth/login', { email, password });
+      await setToken(res.data.accessToken);
+      router.replace('/(tabs)/feed');
+    } catch (err: any) {
+      const message = err.response?.data?.message ?? '로그인 중 오류가 발생했습니다.';
+      Alert.alert('로그인 실패', message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -54,6 +74,7 @@ export default function LoginScreen() {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoComplete="email"
+                editable={!loading}
               />
             </View>
 
@@ -69,6 +90,7 @@ export default function LoginScreen() {
                 onChangeText={setPassword}
                 secureTextEntry
                 autoComplete="password"
+                editable={!loading}
               />
             </View>
           </View>
@@ -77,18 +99,23 @@ export default function LoginScreen() {
           <TouchableOpacity
             className="bg-primary rounded-xl py-4 mt-8 items-center"
             onPress={handleLogin}
+            disabled={loading}
             activeOpacity={0.85}
           >
-            <Text className="text-white text-sm font-semibold tracking-wide">
-              로그인
-            </Text>
+            {loading ? (
+              <ActivityIndicator color="#ffffff" size="small" />
+            ) : (
+              <Text className="text-white text-sm font-semibold tracking-wide">
+                로그인
+              </Text>
+            )}
           </TouchableOpacity>
 
           {/* 회원가입 링크 */}
           <View className="flex-row justify-center mt-6">
             <Text className="text-sm text-secondary">계정이 없으신가요? </Text>
             <Link href="/(auth)/signup" asChild>
-              <TouchableOpacity>
+              <TouchableOpacity disabled={loading}>
                 <Text className="text-sm font-semibold text-primary">
                   회원가입
                 </Text>
