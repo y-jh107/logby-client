@@ -1,11 +1,13 @@
 {
   "expo": {
-    "name": "client",
-    "slug": "client",
+    "name": "Logby",
+    "slug": "logby",
     "version": "1.0.0",
+    "scheme": "logby",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "plugins": ["expo-router"],
     "ios": {
       "supportsTablet": true
     },
