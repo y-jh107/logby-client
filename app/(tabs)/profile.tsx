@@ -11,6 +11,7 @@ import {
   Image,
 } from 'react-native';
 import { router } from 'expo-router';
+
 import { api } from '../../lib/api';
 import { useAuthStore } from '../../store/authStore';
 import LogCard, { LogItem } from '../../components/LogCard';
@@ -337,7 +338,9 @@ export default function ProfileScreen() {
   }, [clearToken]);
 
   const renderItem = useCallback(
-    ({ item }: { item: LogItem }) => <LogCard item={item} />,
+    ({ item }: { item: LogItem }) => (
+      <LogCard item={item} onPress={(i) => router.push(`/log/${i.id}`)} />
+    ),
     []
   );
 

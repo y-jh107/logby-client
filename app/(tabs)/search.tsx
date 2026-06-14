@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
+import { router } from 'expo-router';
 import { api } from '../../lib/api';
 import SearchCard, { SearchResult } from '../../components/SearchCard';
 
@@ -117,7 +118,14 @@ export default function SearchScreen() {
   };
 
   const renderItem = useCallback(
-    ({ item }: { item: SearchResult }) => <SearchCard item={item} />,
+    ({ item }: { item: SearchResult }) => (
+      <SearchCard
+        item={item}
+        onPress={(i) =>
+          router.push({ pathname: '/log/create', params: { item: JSON.stringify(i) } })
+        }
+      />
+    ),
     []
   );
 

@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
+import { router } from 'expo-router';
 import { api } from '../../lib/api';
 import LogCard, { LogItem } from '../../components/LogCard';
 
@@ -67,7 +68,9 @@ export default function FeedScreen() {
   }, [loading, hasMore, page, fetchFeed]);
 
   const renderItem = useCallback(
-    ({ item }: { item: LogItem }) => <LogCard item={item} />,
+    ({ item }: { item: LogItem }) => (
+      <LogCard item={item} onPress={(i) => router.push(`/log/${i.id}`)} />
+    ),
     []
   );
 
@@ -124,6 +127,7 @@ export default function FeedScreen() {
         <TouchableOpacity
           className="w-8 h-8 rounded-full bg-surface items-center justify-center"
           activeOpacity={0.7}
+          onPress={() => router.push('/log/create')}
         >
           <Text className="text-base">✎</Text>
         </TouchableOpacity>
